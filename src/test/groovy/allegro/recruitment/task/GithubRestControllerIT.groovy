@@ -39,15 +39,21 @@ class GithubRestControllerIT extends Specification {
   }
 
   def "Get repository details unsuccessfully"() {
-    given: "existing user and non-existing repository"
-    String owner = "userCreatedToTests"
-    String repository = "x"
+    given: "#owner user and #repository repository"
 
     when: "ask for repository details"
-    mvc.perform(get("${REPOSITORIES}/${owner}/${repository}")).andReturn().response
+    def response = mvc.perform(get("${REPOSITORIES}/${owner}/${repository}")).andReturn().response
 
-    then: "exception is thrown"
-    thrown()
+    then: "404 status is returned"
+    response.status == HttpStatus.NOT_FOUND.value()
+
+    where:
+    owner                 | repository
+    "userCreatedToTests"  | "non-existing"
+    "non-exting"          | "testRepository"
+  }
+
+  def "Get repository details when Github is down"() {
   }
 
   def "Get repository details should be effective"() {

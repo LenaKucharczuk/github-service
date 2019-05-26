@@ -20,7 +20,7 @@ class GithubRestControllerSpec extends Specification {
   MockMvc mvc
 
   @Autowired
-  GithubDetailsService detailsService
+  GithubClient githubClient
 
   @Autowired
   ObjectMapper objectMapper
@@ -29,7 +29,7 @@ class GithubRestControllerSpec extends Specification {
     given: "existing user and existing repository"
     String owner = "userCreatedToTests"
     String repository = "testRepository"
-    detailsService.getRepositoryDetails(owner, repository) >> new RepositoryDetails(repository, "", "", 4, null)
+    githubClient.getRepositoryDetails(owner, repository) >> new RepositoryDetails(repository, "", "", 4, null)
 
     when: "ask for repository details"
     def response = mvc.perform(get("${REPOSITORIES}/${owner}/${repository}")).andReturn().response
@@ -42,14 +42,6 @@ class GithubRestControllerSpec extends Specification {
   }
 
   def "Get repository details unsuccessfully"() {
-    given: "existing user and non-existing repository"
-    String owner = "testRepository"
-    String repository = "x"
-
-    when: "ask for repository details"
-    def response = mvc.perform(get("${REPOSITORIES}/${owner}/${repository}")).andReturn().response
-
-    then: "exception is thrown"
   }
 
   @TestConfiguration
@@ -57,8 +49,8 @@ class GithubRestControllerSpec extends Specification {
     DetachedMockFactory detachedMockFactory = new DetachedMockFactory()
 
     @Bean
-    GithubDetailsService githubDetailsService() {
-      return detachedMockFactory.Stub(GithubDetailsService)
+    GithubClient githubDetailsService() {
+      return detachedMockFactory.Stub(GithubClient)
     }
   }
 }

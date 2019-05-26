@@ -12,12 +12,11 @@ import static allegro.recruitment.task.UriPath.REPOSITORIES;
 @AllArgsConstructor
 public class GithubRestController {
 
-  private final GithubDetailsService githubDetailsService;
+  private final GithubClient githubClient;
 
   @GetMapping(REPOSITORIES + "{owner}/{repositoryName}")
   public ResponseEntity<RepositoryDetails> getRepositoryDetails(@PathVariable String owner, @PathVariable String repositoryName) {
-    ResponseEntity<RepositoryDetails> repositoryDetails = githubDetailsService.getRepositoryDetails(owner,
-        repositoryName);
-    return repositoryDetails;
+    RepositoryDetails repositoryDetails = githubClient.getRepositoryDetails(owner, repositoryName);
+    return ResponseEntity.ok(repositoryDetails);
   }
 }
