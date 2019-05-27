@@ -16,10 +16,10 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestConfiguration {
 
-  @Value("${httpClient.connectionPool.max.connections.total:20}")
+  @Value("${httpClient.connectionPool.max.connections.total:25}")
   private int maxTotalConnections;
 
-  @Value("${httpClient.connectionPool.max.connections.perRoute:20}")
+  @Value("${httpClient.connectionPool.max.connections.perRoute:25}")
   private int maxConnectionsPerRoute;
 
   @Value("${httpClient.connection.request.timeout:0}")

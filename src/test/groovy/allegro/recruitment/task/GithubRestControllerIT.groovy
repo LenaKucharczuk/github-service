@@ -2,10 +2,12 @@ package allegro.recruitment.task
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
@@ -15,6 +17,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc
+@TestPropertySource('classpath:/github-service-IT.properties')
 class GithubRestControllerIT extends Specification {
 
   @Autowired
@@ -23,18 +26,22 @@ class GithubRestControllerIT extends Specification {
   @Autowired
   ObjectMapper objectMapper
 
+  @Value('${existing.owner}')
+  String existingOwner
+
+  @Value('${existing.repository}')
+  String existingRepository
+
   def "Get repository details successfully"() {
     given: "existing user and existing repository"
-    String owner = "userCreatedToTests" // TODO user and repository get from test properties
-    String repository = "testRepository"
 
     when: "ask for repository details"
-    def response = mvc.perform(get("${REPOSITORIES}/${owner}/${repository}")).andReturn().response
+    def response = mvc.perform(get("${REPOSITORIES}/${existingOwner}/${existingRepository}")).andReturn().response
 
     then: "repository details are returned"
     response.status == HttpStatus.OK.value()
     with (objectMapper.readValue(response.contentAsString, RepositoryDetails)) {
-      it.fullName == "${owner}/${repository}"
+      it.fullName == "${existingOwner}/${existingRepository}"
     }
   }
 
@@ -49,8 +56,8 @@ class GithubRestControllerIT extends Specification {
 
     where:
     owner                 | repository
-    "userCreatedToTests"  | "non-existing"
-    "non-exting"          | "testRepository"
+    existingOwner         | "non-existing"
+    "non-existing"        | existingRepository
   }
 
   def "Get repository details when Github is down"() {
@@ -58,12 +65,14 @@ class GithubRestControllerIT extends Specification {
 
   def "Get repository details should be effective"() {
     given: "existing user and existing repository"
-    String owner = "userCreatedToTests"
-    String repository = "testRepository"
+    String owner = existingOwner
+    String repository = existingRepository
+
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor()
     executor.setCorePoolSize(25)
     executor.setMaxPoolSize(25)
     executor.initialize()
+
     when: "ask for repository details"
     for (int i = 0; i < 20; ++i) {
       executor.submit({

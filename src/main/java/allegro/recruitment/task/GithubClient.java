@@ -1,7 +1,6 @@
 package allegro.recruitment.task;
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,7 +15,6 @@ public class GithubClient {
 
   private static final String GITHUB_URL = "https://api.github.com";
 
-  @Value("${github.token}")
   private static final String AUTH_TOKEN = "cf2315345b5fe420161561c1744b840beb510fae";
 
   RepositoryDetails getRepositoryDetails(String owner, String repositoryName) {
@@ -26,7 +24,7 @@ public class GithubClient {
   }
 
   private String getUrl(String owner, String repositoryName) {
-    return String.format("%s/repos/%s/%s", GITHUB_URL, owner, repositoryName);
+    return GITHUB_URL + "/repos/" + owner + "/" + repositoryName;
   }
 
 }
