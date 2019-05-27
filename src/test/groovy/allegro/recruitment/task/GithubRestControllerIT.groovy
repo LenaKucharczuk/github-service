@@ -27,10 +27,10 @@ class GithubRestControllerIT extends Specification {
   ObjectMapper objectMapper
 
   @Value('${existing.owner}')
-  String existingOwner
+  static String existingOwner
 
   @Value('${existing.repository}')
-  String existingRepository
+  static String existingRepository
 
   def "Get repository details successfully"() {
     given: "existing user and existing repository"

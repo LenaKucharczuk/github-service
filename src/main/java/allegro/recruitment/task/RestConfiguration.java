@@ -16,19 +16,19 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestConfiguration {
 
-  @Value("${httpClient.connectionPool.max.connections.total:25}")
+  @Value("${httpClient.connectionPool.max.connections.total}")
   private int maxTotalConnections;
 
-  @Value("${httpClient.connectionPool.max.connections.perRoute:25}")
+  @Value("${httpClient.connectionPool.max.connections.perRoute}")
   private int maxConnectionsPerRoute;
 
-  @Value("${httpClient.connection.request.timeout:0}")
+  @Value("${httpClient.connection.request.timeout}")
   private int connectionRequestTimeout;
 
-  @Value("${httpClient.connect.timeout:0}")
+  @Value("${httpClient.connect.timeout}")
   private int connectTimeout;
 
-  @Value("${httpClient.read.timeout:0}")
+  @Value("${httpClient.read.timeout}")
   private int readTimeout;
 
   @Bean
