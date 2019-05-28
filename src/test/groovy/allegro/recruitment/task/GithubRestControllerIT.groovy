@@ -1,49 +1,41 @@
 package allegro.recruitment.task
 
-import com.fasterxml.jackson.databind.ObjectMapper
+
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
 import static allegro.recruitment.task.UriPath.REPOSITORIES
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc
-@TestPropertySource('classpath:/github-service-IT.properties')
 class GithubRestControllerIT extends Specification {
 
   @Autowired
   MockMvc mvc
 
-  @Autowired
-  ObjectMapper objectMapper
-
-  @Value('${existing.owner}')
-  String existingOwner
-
-  @Value('${existing.repository}')
-  String existingRepository
+  String existingOwner = "userCreatedToTests"
+  String existingRepository = "testRepository"
 
   def "Get repository details successfully"() {
     given: "existing user and existing repository"
 
     when: "ask for repository details"
-    def response = mvc.perform(get("${REPOSITORIES}/${existingOwner}/${existingRepository}")).andReturn().response
+    def response = mvc.perform(get("${REPOSITORIES}/${existingOwner}/${existingRepository}"))
 
     then: "repository details are returned"
-    response.status == HttpStatus.OK.value()
-    with (objectMapper.readValue(response.contentAsString, RepositoryDetails)) {
-      it.fullName == "${existingOwner}/${existingRepository}"
-      it.cloneUrl == "https://github.com/${existingOwner}/${existingRepository}.git"
-      it.createdAt.toOffsetDateTime().toString() == "2019-05-26T14:52:20Z"
-    }
+    response
+        .andExpect(status().isOk())
+        .andExpect(jsonPath('$.fullName').value(existingOwner + "/" + existingRepository))
+        .andExpect(jsonPath('$.cloneUrl').value("https://github.com/" + existingOwner + "/" + existingRepository + ".git"))
+        .andExpect(jsonPath('$.createdAt').value("2019-05-26T14:52:20Z"))
   }
 
   def "Get repository details for non-existing repository"() {
@@ -60,7 +52,7 @@ class GithubRestControllerIT extends Specification {
     given: "non-existing user"
 
     when: "ask for repository details"
-    def response = mvc.perform(get("${REPOSITORIES}/notExistingOwner/someRepository")).andReturn().response
+    def response = mvc.perform(get("${REPOSITORIES}/notExistingOwner/${existingRepository}")).andReturn().response
 
     then: "404 status is returned"
     response.status == HttpStatus.NOT_FOUND.value()

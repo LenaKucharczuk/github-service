@@ -22,11 +22,6 @@ GET /repositories/{owner}/{repository-name}
 
 ### Requirements
 * JDK 1.8
-* Git
-
-### Prepare repository
-* `git clone https://lenakucharczuk@bitbucket.org/lenakucharczuk/github-service.git`
-* `cd github-service`
 
 ### Run on local environment
 * `mvn clean install`
