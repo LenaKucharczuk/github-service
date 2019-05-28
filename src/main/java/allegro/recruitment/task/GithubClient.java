@@ -20,10 +20,10 @@ public class GithubClient {
   RepositoryDetails getRepositoryDetails(String owner, String repositoryName) {
     HttpHeaders headers = new HttpHeaders();
     headers.set(HttpHeaders.AUTHORIZATION, "token " + AUTH_TOKEN);
-    return restTemplate.exchange(getUrl(owner, repositoryName), HttpMethod.GET, new HttpEntity(headers), RepositoryDetails.class).getBody();
+    return restTemplate.exchange(getRepositoryDetailsUrl(owner, repositoryName), HttpMethod.GET, new HttpEntity(headers), RepositoryDetails.class).getBody();
   }
 
-  private String getUrl(String owner, String repositoryName) {
+  private String getRepositoryDetailsUrl(String owner, String repositoryName) {
     return GITHUB_URL + "/repos/" + owner + "/" + repositoryName;
   }
 

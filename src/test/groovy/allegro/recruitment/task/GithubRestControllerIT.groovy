@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
@@ -27,10 +26,10 @@ class GithubRestControllerIT extends Specification {
   ObjectMapper objectMapper
 
   @Value('${existing.owner}')
-  static String existingOwner
+  String existingOwner
 
   @Value('${existing.repository}')
-  static String existingRepository
+  String existingRepository
 
   def "Get repository details successfully"() {
     given: "existing user and existing repository"
@@ -42,49 +41,28 @@ class GithubRestControllerIT extends Specification {
     response.status == HttpStatus.OK.value()
     with (objectMapper.readValue(response.contentAsString, RepositoryDetails)) {
       it.fullName == "${existingOwner}/${existingRepository}"
+      it.cloneUrl == "https://github.com/${existingOwner}/${existingRepository}.git"
+      it.createdAt.toOffsetDateTime().toString() == "2019-05-26T14:52:20Z"
     }
   }
 
-  def "Get repository details unsuccessfully"() {
-    given: "#owner user and #repository repository"
+  def "Get repository details for non-existing repository"() {
+    given: "existing user and non-existing repository"
 
     when: "ask for repository details"
-    def response = mvc.perform(get("${REPOSITORIES}/${owner}/${repository}")).andReturn().response
+    def response = mvc.perform(get("${REPOSITORIES}/${existingOwner}/notExistingRepo")).andReturn().response
 
     then: "404 status is returned"
     response.status == HttpStatus.NOT_FOUND.value()
-
-    where:
-    owner                 | repository
-    existingOwner         | "non-existing"
-    "non-existing"        | existingRepository
   }
 
-  def "Get repository details when Github is down"() {
-  }
-
-  def "Get repository details should be effective"() {
-    given: "existing user and existing repository"
-    String owner = existingOwner
-    String repository = existingRepository
-
-    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor()
-    executor.setCorePoolSize(25)
-    executor.setMaxPoolSize(25)
-    executor.initialize()
+  def "Get repository details for non-existing owner"() {
+    given: "non-existing user"
 
     when: "ask for repository details"
-    for (int i = 0; i < 20; ++i) {
-      executor.submit({
-        println("Start")
-        long start = System.nanoTime()
-        mvc.perform(get("${REPOSITORIES}/${owner}/${repository}")).andReturn().response
-        double elapsedTimeInSecond = (double) (System.nanoTime()-start) / 1_000_000_000
-        println("Finished : ${elapsedTimeInSecond}")
-      })
-    }
+    def response = mvc.perform(get("${REPOSITORIES}/notExistingOwner/someRepository")).andReturn().response
 
-    then: "repository details are returned"
-    Thread.sleep(5000)
+    then: "404 status is returned"
+    response.status == HttpStatus.NOT_FOUND.value()
   }
 }

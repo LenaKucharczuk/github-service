@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <property name="log.dir" value="${catalina.base:-${user.dir}}/logs"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <pattern>%p [%thread] %d{yyyy-MM-dd HH:mm:ss} %c module:github-service %X{requestId} - %m%n</pattern>
+      </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <File>${log.dir}/github-service.log</File>
+      <Append>true</Append>
+      <encoder>
+        <pattern>%p [%thread] %d{yyyy-MM-dd HH:mm:ss} %c module:github-service %X{requestId} - %m%n</pattern>
+      </encoder>
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <fileNamePattern>${log.dir}/github-service.%d{yyyy-MM-dd}.log</fileNamePattern>
+      </rollingPolicy>
+    </appender>
+
+    <logger name="github.service" level="INFO" additivity="false">
+      <appender-ref ref="STDOUT"/>
+      <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="INFO">
+      <appender-ref ref="STDOUT"/>
+      <appender-ref ref="FILE"/>
+    </root>
+</configuration>
