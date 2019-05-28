@@ -1,11 +1,9 @@
 package allegro.recruitment.task
 
-
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 import spock.lang.Subject
 
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
@@ -20,7 +18,7 @@ class GithubClientSpec extends Specification {
   GithubClient githubClient = new GithubClient(restTemplate)
 
   def "GetRepositoryDetails"() {
-    given:
+    given: "mocked response"
 
     when: "ask for repository details"
     def repositoryDetails = githubClient.getRepositoryDetails("owner", "repository")
@@ -34,6 +32,6 @@ class GithubClientSpec extends Specification {
   }
 
   private static ZonedDateTime getSampleDate() {
-    ZonedDateTime.of(LocalDateTime.of(2019, 2, 10, 17, 0, 0), ZoneId.of("UTC"))
+    ZonedDateTime.of(2019, 2, 10, 17, 0, 0, 0, ZoneId.of("UTC"))
   }
 }

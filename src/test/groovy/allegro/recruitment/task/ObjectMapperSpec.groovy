@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
+import java.time.ZoneId
+import java.time.ZonedDateTime
+
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE
 
 @SpringBootTest(webEnvironment = NONE)
@@ -37,6 +40,6 @@ class ObjectMapperSpec extends Specification {
     repositoryDetails.description == "description"
     repositoryDetails.cloneUrl == "cloneUrl"
     repositoryDetails.stars == 123
-    repositoryDetails.createdAt.toOffsetDateTime().toString() == "2019-05-26T14:52:20Z"
+    repositoryDetails.createdAt == ZonedDateTime.of(2019, 5, 26, 14, 52, 20, 0, ZoneId.of("UTC"))
   }
 }
