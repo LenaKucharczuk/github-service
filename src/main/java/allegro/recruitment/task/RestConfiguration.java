@@ -1,35 +1,24 @@
 package allegro.recruitment.task;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
-@Setter
+@RequiredArgsConstructor
 @Configuration
 public class RestConfiguration {
 
-  @Value("${httpClient.connectionPool.max.connections.total}")
-  private int maxTotalConnections;
-
-  @Value("${httpClient.connectionPool.max.connections.perRoute}")
-  private int maxConnectionsPerRoute;
-
-  @Value("${httpClient.connection.request.timeout}")
-  private int connectionRequestTimeout;
-
-  @Value("${httpClient.connect.timeout}")
-  private int connectTimeout;
-
-  @Value("${httpClient.read.timeout}")
-  private int readTimeout;
+  private final HttpClientConfigProperties httpProperties;
 
   @Bean
   public RestTemplate restTemplate(HttpClient httpClient) {
@@ -50,17 +39,33 @@ public class RestConfiguration {
   @Bean
   public PoolingHttpClientConnectionManager poolingHttpClientConnectionManager() {
     PoolingHttpClientConnectionManager result = new PoolingHttpClientConnectionManager();
-    result.setMaxTotal(maxTotalConnections);
-    result.setDefaultMaxPerRoute(maxConnectionsPerRoute);
+    result.setMaxTotal(httpProperties.getMaxTotalConnections());
+    result.setDefaultMaxPerRoute(httpProperties.getMaxConnectionsPerRoute());
     return result;
   }
 
   @Bean
   public RequestConfig requestConfig() {
     return RequestConfig.custom()
-        .setConnectionRequestTimeout(connectionRequestTimeout)
-        .setConnectTimeout(connectTimeout)
-        .setSocketTimeout(readTimeout)
+        .setConnectionRequestTimeout(httpProperties.getConnectionRequestTimeout())
+        .setConnectTimeout(httpProperties.getConnectTimeout())
+        .setSocketTimeout(httpProperties.getReadTimeout())
         .build();
   }
+}
+
+@Configuration
+@ConfigurationProperties(prefix = "httpclient")
+@Getter
+@Setter
+class HttpClientConfigProperties {
+  private int maxTotalConnections;
+
+  private int maxConnectionsPerRoute;
+
+  private int connectionRequestTimeout;
+
+  private int connectTimeout;
+
+  private int readTimeout;
 }

@@ -20,6 +20,7 @@
     <spock.framework.version>1.3-groovy-2.5</spock.framework.version>
     <gmavenplus.maven.plugin.version>1.6.1</gmavenplus.maven.plugin.version>
     <httpclient.version>4.5.2</httpclient.version>
+    <wiremock-jre8-standalone.version>2.23.2</wiremock-jre8-standalone.version>
   </properties>
 
   <dependencies>
@@ -63,6 +64,13 @@
       <groupId>org.spockframework</groupId>
       <artifactId>spock-spring</artifactId>
       <version>${spock.framework.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-jre8-standalone</artifactId>
+      <version>${wiremock-jre8-standalone.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
