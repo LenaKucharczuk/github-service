@@ -1,7 +1,7 @@
-#Github Service
+# Github Service
 REST service which returns details of given Github repository.
 
-###API of the service:
+### API of the service:
 `GET /repositories/{owner}/{repository-name}`
 ```json
 {
